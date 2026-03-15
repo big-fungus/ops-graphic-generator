@@ -73,7 +73,7 @@ function scaleToFit(
   maxW: number,
   maxH: number
 ): { w: number; h: number } {
-  const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+  const scale = Math.min(maxW / imgW, maxH / imgH);
   return { w: imgW * scale, h: imgH * scale };
 }
 
@@ -102,7 +102,10 @@ export async function drawComposite(
   canvas.width = base.width;
   canvas.height = base.height + topPadding;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // White background is required: source PNGs are 1-bit/colormap (no true
+  // transparency) so compositing without a background produces a black canvas.
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Draw size indicator centered above the base symbol
   if (sizeImg) {
