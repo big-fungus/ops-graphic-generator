@@ -35,7 +35,7 @@ body {
 
 .app-body {
   display: grid;
-  grid-template-columns: 280px 1fr 320px;
+  grid-template-columns: 300px 1fr 320px;
   flex: 1;
   overflow: hidden;
   gap: 0;
@@ -99,8 +99,10 @@ body {
 
 .symbol-canvas {
   display: block;
-  max-width: 400px;
-  max-height: 400px;
+  max-width: 100%;
+  max-height: calc(100vh - 120px);
+  width: auto;
+  height: auto;
   image-rendering: pixelated;
 }
 
@@ -156,8 +158,8 @@ body {
 
 /* ── Size selector ────────────────────────────────────────────────────────── */
 .size-selector {
-  padding: 12px 16px;
-  background: #fff;
+  padding: 12px 0;
+  background: transparent;
   border-top: 1px solid #e0e0e0;
   flex-shrink: 0;
 }

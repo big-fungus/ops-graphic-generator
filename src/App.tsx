@@ -79,23 +79,23 @@ export default function App() {
       </header>
 
       <div className="app-body">
-        {/* Left column: base symbol selector */}
+        {/* Left column: base symbol selector + unit size */}
         <aside className="panel left-panel">
           <BasicSymbolSelector
             selected={state.baseSymbol}
             onSelect={handleBaseSymbolSelect}
           />
-        </aside>
-
-        {/* Center column: canvas preview + size selector */}
-        <main className="center-column">
-          <div className="canvas-area">
-            <SymbolCanvas ref={canvasRef} state={state} />
-          </div>
           <SizeSelector
             selected={state.sizeIndicator}
             onSelect={handleSizeSelect}
           />
+        </aside>
+
+        {/* Center column: canvas preview */}
+        <main className="center-column">
+          <div className="canvas-area">
+            <SymbolCanvas ref={canvasRef} state={state} />
+          </div>
         </main>
 
         {/* Right column: modifier panel */}

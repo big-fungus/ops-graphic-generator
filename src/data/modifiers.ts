@@ -40,16 +40,16 @@ const MODIFIER_DEFS: ModifierDef[] = [
   { id: 'gun_system',                label: 'Gun System',                  folder: 'center left',   filename: 'gun_sytem.png',                        defaultPosition: 'centerLeft' },
 
   // top center/
-  { id: 'air_assault',               label: 'Air Assault',                 folder: 'top center',    filename: 'air_assault.png',                      defaultPosition: 'topCenter' },
-  { id: 'bicycle_equipped',          label: 'Bicycle Equipped',            folder: 'top center',    filename: 'bicycle_equipped.png',                 defaultPosition: 'topCenter' },
-  { id: 'naval',                     label: 'Naval',                       folder: 'top center',    filename: 'naval.png',                            defaultPosition: 'topCenter' },
-  { id: 'ski',                       label: 'Ski',                         folder: 'top center',    filename: 'ski.png',                              defaultPosition: 'topCenter' },
+  { id: 'air_assault',               label: 'Air Assault',                 folder: 'top center',    filename: 'air_assault.png',                      defaultPosition: 'topCenter', fillRatio: 0.65 },
+  { id: 'bicycle_equipped',          label: 'Bicycle Equipped',            folder: 'top center',    filename: 'bicycle_equipped.png',                 defaultPosition: 'topCenter', fillRatio: 0.65 },
+  { id: 'naval',                     label: 'Naval',                       folder: 'top center',    filename: 'naval.png',                            defaultPosition: 'topCenter', fillRatio: 0.65 },
+  { id: 'ski',                       label: 'Ski',                         folder: 'top center',    filename: 'ski.png',                              defaultPosition: 'topCenter', fillRatio: 0.65 },
 
   // bottom center/
-  { id: 'airborne',                  label: 'Airborne',                    folder: 'bottom center', filename: 'airborne.png',                         defaultPosition: 'botCenter' },
-  { id: 'mountain',                  label: 'Mountain',                    folder: 'bottom center', filename: 'mountain.png',                         defaultPosition: 'botCenter' },
-  { id: 'supply',                    label: 'Supply',                      folder: 'bottom center', filename: 'supply.png',                           defaultPosition: 'botCenter' },
-  { id: 'air_assault_org_lift',      label: 'Air Assault (org lift)',      folder: 'bottom center', filename: 'air_assault_with_org_lift.png',         defaultPosition: 'botCenter' },
+  { id: 'airborne',                  label: 'Airborne',                    folder: 'bottom center', filename: 'airborne.png',                         defaultPosition: 'botCenter', fillRatio: 0.45 },
+  { id: 'mountain',                  label: 'Mountain',                    folder: 'bottom center', filename: 'mountain.png',                         defaultPosition: 'botCenter', fillRatio: 0.50 },
+  { id: 'supply',                    label: 'Supply',                      folder: 'bottom center', filename: 'supply.png',                           defaultPosition: 'botCenter', fillRatio: 0.50 },
+  { id: 'air_assault_org_lift',      label: 'Air Assault (org lift)',      folder: 'bottom center', filename: 'air_assault_with_org_lift.png',         defaultPosition: 'botCenter', fillRatio: 0.50 },
 ];
 
 export const MODIFIERS: Modifier[] = MODIFIER_DEFS.map(d => ({
