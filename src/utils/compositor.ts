@@ -1,4 +1,4 @@
-import type { SymbolState, InnerBounds, Position } from '../types';
+import type { SymbolState, InnerBounds, Position, ScaleMode } from '../types';
 
 // ---------------------------------------------------------------------------
 // Image loading (cached)
@@ -74,14 +74,48 @@ function getCell(position: Position, bounds: InnerBounds): Cell {
   }
 }
 
-function scaleToFit(
+function scaleModifier(
   imgW: number,
   imgH: number,
-  maxW: number,
-  maxH: number
+  cellW: number,
+  cellH: number,
+  fillRatio: number = 1.0,
+  scaleMode: ScaleMode = 'fit'
 ): { w: number; h: number } {
+  // Apply fill ratio — shrinks the available cell space
+  const maxW = cellW * fillRatio;
+  const maxH = cellH * fillRatio;
+
+  if (scaleMode === 'stretch') {
+    // Stretch to fill the cell (ignores aspect ratio)
+    return { w: maxW, h: maxH };
+  }
+
+  if (scaleMode === 'cover') {
+    // Scale up to cover the entire cell (may overflow)
+    const scale = Math.max(maxW / imgW, maxH / imgH);
+    return { w: imgW * scale, h: imgH * scale };
+  }
+
+  // Default: 'fit' — contain within the cell, preserving aspect ratio
   const scale = Math.min(maxW / imgW, maxH / imgH);
   return { w: imgW * scale, h: imgH * scale };
+}
+
+/**
+ * Shrink innerBounds inward by shapePadding factor.
+ * shapePadding of 0.15 means shrink each side by 15% of that dimension.
+ */
+function applyShapePadding(bounds: InnerBounds, padding: number): InnerBounds {
+  if (!padding) return bounds;
+  const dx = bounds.w * padding;
+  const dy = bounds.h * padding;
+  return {
+    x: bounds.x + dx,
+    y: bounds.y + dy,
+    w: bounds.w - 2 * dx,
+    h: bounds.h - 2 * dy,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -124,18 +158,23 @@ export async function drawComposite(
   ctx.drawImage(base, 0, topPadding);
 
   // Draw modifiers
-  const bounds = state.baseSymbol.innerBounds;
-  const offsetBounds: InnerBounds = { ...bounds, y: bounds.y + topPadding };
+  const rawBounds = state.baseSymbol.innerBounds;
+  const shapePad = state.baseSymbol.shapePadding ?? 0;
+  const paddedBounds = applyShapePadding(rawBounds, shapePad);
+  const offsetBounds: InnerBounds = { ...paddedBounds, y: paddedBounds.y + topPadding };
 
   for (const [pos, mods] of Object.entries(state.modifiers) as [Position, typeof state.modifiers[Position]][]) {
     if (!mods || mods.length === 0) continue;
     const cell = getCell(pos, offsetBounds);
 
-    // Multiple modifiers at the same position are layered on top of each other
-    // at full cell size — no subdivision.
     for (const mod of mods) {
       const img = await loadImage(mod.path);
-      const { w, h } = scaleToFit(img.width, img.height, cell.w, cell.h);
+      const { w, h } = scaleModifier(
+        img.width, img.height,
+        cell.w, cell.h,
+        mod.fillRatio ?? 1.0,
+        mod.scaleMode ?? 'fit'
+      );
       ctx.drawImage(img, cell.cx - w / 2, cell.cy - h / 2, w, h);
     }
   }
