@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Static PNG assets — binary files, not useful for code context
+Ops Graphics/
+
+# Lock file
+package-lock.json
+
+# Git
+.git/

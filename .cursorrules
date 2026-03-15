@@ -1,0 +1,18 @@
+You are working on "Ops Graphic Generator", a React + TypeScript + Vite app that composes NATO military map symbols (APP-6 / MIL-STD-2525) from PNG assets onto an HTML Canvas.
+
+Key architecture points:
+- All state lives in App.tsx as a single SymbolState object (no state library)
+- Rendering happens in src/utils/compositor.ts via drawComposite() which layers PNGs on a canvas
+- Asset definitions are in src/data/ (symbols.ts, modifiers.ts, sizes.ts)
+- Types are in src/types/index.ts
+- Static PNGs are in "Ops Graphics/" (Vite publicDir) — do not modify these binary files
+- There are no tests configured
+
+When modifying modifier behavior:
+- fillRatio (0-1) controls how much of the cell a modifier fills
+- scaleMode ('fit'|'cover'|'stretch') controls aspect ratio handling
+- shapePadding on base symbols (0-0.2) insets bounds for non-rectangular frames
+- "Full-frame" icons (infantry, recon) use stretch mode per APP-6 standard
+- Normal icons use fit mode with reduced fillRatio
+
+Prefer minimal changes. This is a small focused app (~12 source files).
