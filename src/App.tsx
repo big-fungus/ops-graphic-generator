@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, type ReactNode } from 'react';
 import type { SymbolState, BaseSymbol, SizeIndicator, Modifier, Position } from './types';
 import { DEFAULT_SYMBOL } from './data/symbols';
 import SymbolCanvas, { type SymbolCanvasHandle } from './components/SymbolCanvas';
@@ -14,9 +14,34 @@ const INITIAL_STATE: SymbolState = {
   modifiers: {},
 };
 
+type Tab = 'symbol' | 'preview' | 'modifiers';
+
+function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
+  const tabs: { id: Tab; label: string; icon: ReactNode }[] = [
+    { id: 'symbol',    label: 'Symbol',    icon: '⊞' },
+    { id: 'preview',   label: 'Preview',   icon: '◎' },
+    { id: 'modifiers', label: 'Modifiers', icon: '☰' },
+  ];
+  return (
+    <nav className="mobile-tab-bar" aria-label="Navigation">
+      {tabs.map(t => (
+        <button
+          key={t.id}
+          className={`tab-btn${active === t.id ? ' active' : ''}`}
+          onClick={() => onChange(t.id)}
+        >
+          <span className="tab-icon" aria-hidden="true">{t.icon}</span>
+          <span className="tab-label">{t.label}</span>
+        </button>
+      ))}
+    </nav>
+  );
+}
+
 export default function App() {
   const [state, setState] = useState<SymbolState>(INITIAL_STATE);
   const canvasRef = useRef<SymbolCanvasHandle>(null);
+  const [activeTab, setActiveTab] = useState<Tab>('preview');
 
   const handleBaseSymbolSelect = useCallback((symbol: BaseSymbol) => {
     setState(prev => ({ ...prev, baseSymbol: symbol }));
@@ -80,7 +105,7 @@ export default function App() {
 
       <div className="app-body">
         {/* Left column: base symbol selector + unit size */}
-        <aside className="panel left-panel">
+        <aside className={`panel left-panel${activeTab !== 'symbol' ? ' tab-hidden' : ''}`}>
           <BasicSymbolSelector
             selected={state.baseSymbol}
             onSelect={handleBaseSymbolSelect}
@@ -92,14 +117,14 @@ export default function App() {
         </aside>
 
         {/* Center column: canvas preview */}
-        <main className="center-column">
+        <main className={`center-column${activeTab !== 'preview' ? ' tab-hidden' : ''}`}>
           <div className="canvas-area">
             <SymbolCanvas ref={canvasRef} state={state} />
           </div>
         </main>
 
         {/* Right column: modifier panel */}
-        <aside className="panel right-panel">
+        <aside className={`panel right-panel${activeTab !== 'modifiers' ? ' tab-hidden' : ''}`}>
           <ModifierPanel
             state={state}
             onAdd={handleAddModifier}
@@ -108,6 +133,8 @@ export default function App() {
           />
         </aside>
       </div>
+
+      <TabBar active={activeTab} onChange={setActiveTab} />
     </div>
   );
 }
