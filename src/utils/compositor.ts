@@ -1,6 +1,13 @@
 import type { SymbolState, InnerBounds, Position, ScaleMode } from '../types';
 
 // ---------------------------------------------------------------------------
+// Render scale — canvas dimensions and all drawing coordinates are multiplied
+// by this factor, producing a higher-resolution output for a crisp preview
+// and high-quality PNG export.
+// ---------------------------------------------------------------------------
+const RENDER_SCALE = 3;
+
+// ---------------------------------------------------------------------------
 // Image loading (cached)
 // ---------------------------------------------------------------------------
 
@@ -139,14 +146,19 @@ export async function drawComposite(
     topPadding = sizeImg.height + 6;
   }
 
-  // Resize canvas
-  canvas.width = base.width;
-  canvas.height = base.height + topPadding;
+  // Scale canvas to RENDER_SCALE × native dimensions
+  canvas.width = base.width * RENDER_SCALE;
+  canvas.height = (base.height + topPadding) * RENDER_SCALE;
 
   // White background is required: source PNGs are 1-bit/colormap (no true
   // transparency) so compositing without a background produces a black canvas.
+  // Must happen BEFORE ctx.scale() — uses physical canvas pixel coordinates.
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Apply scale transform — all drawing below uses native-pixel coordinates.
+  ctx.save();
+  ctx.scale(RENDER_SCALE, RENDER_SCALE);
 
   // Draw size indicator centered above the base symbol
   if (sizeImg) {
@@ -168,6 +180,21 @@ export async function drawComposite(
     const cell = getCell(pos, offsetBounds);
 
     for (const mod of mods) {
+      // Recon slash: draw programmatically corner-to-corner to avoid PNG margin artifacts
+      if (mod.id === 'recon') {
+        const lineW = Math.max(1, Math.round(Math.min(offsetBounds.w, offsetBounds.h) * 0.035));
+        ctx.save();
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = lineW;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(offsetBounds.x, offsetBounds.y);
+        ctx.lineTo(offsetBounds.x + offsetBounds.w, offsetBounds.y + offsetBounds.h);
+        ctx.stroke();
+        ctx.restore();
+        continue;
+      }
+
       const img = await loadImage(mod.path);
       const { w, h } = scaleModifier(
         img.width, img.height,
@@ -178,6 +205,8 @@ export async function drawComposite(
       ctx.drawImage(img, cell.cx - w / 2, cell.cy - h / 2, w, h);
     }
   }
+
+  ctx.restore();
 }
 
 // ---------------------------------------------------------------------------
